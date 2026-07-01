@@ -95,7 +95,7 @@ export default function App() {
         </header>
 
         {/* Konten Tab yang bisa di-scroll */}
-        <main className="flex-1 overflow-y-auto p-4 md:p-8 pb-24 md:pb-8">
+        <main className="flex-1 overflow-y-auto overscroll-behavior-y-contain p-4 md:p-8 pb-24 md:pb-8">
           <div className="max-w-6xl mx-auto h-full">
             {activeTab === "kas" && <BukuKas />}
             {activeTab === "kalkulator" && <Kalkulator />}

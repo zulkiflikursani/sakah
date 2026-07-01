@@ -2,9 +2,9 @@
 import Image from "next/image";
 import { useState, useEffect } from "react";
 import { BukuKas } from "@/app/bukukas/BukuKas";
-import { Kalkulator } from "@/app/components/Kalkulator";
-import { Edukasi } from "@/app/components/Edukasi";
-import { Gamifikasi } from "@/app/components/Gamifikasi";
+import { Kalkulator } from "@/app/kalkulator/Kalkulator";
+import { Edukasi } from "@/app/edukasi/Edukasi";
+import { Gamifikasi } from "@/app/gamifikasi/Gamifikasi";
 
 import {
   Home,

@@ -70,8 +70,63 @@ export function BukuKas() {
 
   if (loading) {
     return (
-      <div className="p-4 flex items-center justify-center min-h-full text-gray-500">
-        Memuat data kas syariah...
+      <div className="p-4 relative min-h-full animate-pulse select-none">
+        {/* Skeleton Saldo Card */}
+        <div className="sticky top-0 z-20 pt-4 pb-2 -mt-4 bg-gray-50 lg:bg-transparent lg:p-0 lg:m-0 lg:top-0">
+          <div className="bg-gray-200 rounded-2xl p-6 shadow-md h-40 flex flex-col justify-between">
+            <div>
+              <div className="h-4 bg-gray-300 rounded w-1/4 mb-2"></div>
+              <div className="h-8 bg-gray-300 rounded w-1/2"></div>
+            </div>
+            <div className="flex justify-between border-t border-gray-300/50 pt-4">
+              <div className="flex items-center gap-2 w-1/3">
+                <div className="bg-gray-300 p-4 rounded-full h-8 w-8 shrink-0"></div>
+                <div className="w-full space-y-1">
+                  <div className="h-3 bg-gray-300 rounded w-1/2"></div>
+                  <div className="h-4 bg-gray-300 rounded w-3/4"></div>
+                </div>
+              </div>
+              <div className="flex items-center gap-2 w-1/3">
+                <div className="bg-gray-300 p-4 rounded-full h-8 w-8 shrink-0"></div>
+                <div className="w-full space-y-1">
+                  <div className="h-3 bg-gray-300 rounded w-1/2"></div>
+                  <div className="h-4 bg-gray-300 rounded w-3/4"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Skeleton Judul Transaksi Terbaru */}
+        <div className="mb-4 mt-6 flex justify-between items-end">
+          <div className="h-6 bg-gray-200 rounded w-1/3"></div>
+          <div className="h-4 bg-gray-200 rounded w-16"></div>
+        </div>
+
+        {/* Skeleton List Transaksi (Looping 3 Baris Tiruan) */}
+        <div className="space-y-3">
+          {[1, 2, 3].map((index) => (
+            <div
+              key={index}
+              className="bg-white p-4 rounded-xl border border-gray-100 flex justify-between items-center"
+            >
+              <div className="flex items-center gap-3 w-2/3">
+                {/* Lingkaran Ikon */}
+                <div className="bg-gray-200 rounded-full h-11 w-11 shrink-0"></div>
+                {/* Teks Kategori & Tanggal */}
+                <div className="w-full space-y-2">
+                  <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                  <div className="flex gap-2">
+                    <div className="h-3 bg-gray-200 rounded w-1/4"></div>
+                    <div className="h-3 bg-gray-200 rounded w-1/6"></div>
+                  </div>
+                </div>
+              </div>
+              {/* Nominal Kanan */}
+              <div className="h-5 bg-gray-200 rounded w-16"></div>
+            </div>
+          ))}
+        </div>
       </div>
     );
   }

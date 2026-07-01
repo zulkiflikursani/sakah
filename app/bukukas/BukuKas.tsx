@@ -1,50 +1,80 @@
-import { useState } from "react";
+"use client";
+
+import { useState, useEffect } from "react";
 import { ShieldCheck, TrendingUp, TrendingDown, Plus } from "lucide-react";
-import { AddTransactionModal } from "./AddTransactionModel";
+import { AddTransactionModal } from "../components/AddTransactionModel";
 
 export function BukuKas() {
   const [showAddForm, setShowAddForm] = useState(false);
-  const [transactions, setTransactions] = useState([
-    {
-      id: 1,
-      type: "income",
-      amount: 1500000,
-      category: "Penjualan Produk",
-      date: "Hari ini",
-      isHalal: true,
-    },
-    {
-      id: 2,
-      type: "expense",
-      amount: 350000,
-      category: "Bahan Baku",
-      date: "Kemarin",
-      isHalal: true,
-    },
-    {
-      id: 3,
-      type: "expense",
-      amount: 50000,
-      category: "Transportasi",
-      date: "Kemarin",
-      isHalal: true,
-    },
-  ]);
+  const [transactions, setTransactions] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const totalIncome = transactions
-    .filter((t) => t.type === "income")
-    .reduce((acc, curr) => acc + curr.amount, 0);
-  const totalExpense = transactions
-    .filter((t) => t.type === "expense")
-    .reduce((acc, curr) => acc + curr.amount, 0);
-  const balance = totalIncome - totalExpense;
+  // 1. Fungsi untuk mengambil data dari API Endpoint Vercel Postgres
+  const fetchTransactions = async () => {
+    try {
+      const res = await fetch("/api/transaksi");
+      const json = await res.json();
+      if (json.success) {
+        setTransactions(json.data);
+      }
+    } catch (error) {
+      console.error("Gagal mengambil data transaksi:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  const handleAddTransaction = (
+  // Jalankan fetch saat komponen pertama kali dimuat
+  useEffect(() => {
+    fetchTransactions();
+  }, []);
+
+  // 2. Fungsi untuk menyimpan data baru via POST ke API
+  const handleAddTransaction = async (
     newTrx: Omit<(typeof transactions)[0], "id">,
   ) => {
-    setTransactions([{ id: Date.now(), ...newTrx }, ...transactions]);
-    setShowAddForm(false);
+    try {
+      const res = await fetch("/api/transaksi", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          type: newTrx.type,
+          amount: newTrx.amount,
+          category: newTrx.category,
+          is_halal: newTrx.isHalal ?? true, // Menyesuaikan nama properti database snake_case
+        }),
+      });
+
+      if (res.ok) {
+        // Segarkan data dari database agar sinkron secara real-time
+        fetchTransactions();
+        setShowAddForm(false);
+      } else {
+        alert("Gagal menyimpan transaksi ke database.");
+      }
+    } catch (error) {
+      console.error("Terjadi kesalahan saat menyimpan transaksi:", error);
+    }
   };
+
+  // Logika kalkulasi keuangan tetap sama (Konversi Number untuk menjaga presisi tipe DECIMAL)
+  const totalIncome = transactions
+    .filter((t) => t.type === "income")
+    .reduce((acc, curr) => acc + Number(curr.amount), 0);
+  const totalExpense = transactions
+    .filter((t) => t.type === "expense")
+    .reduce((acc, curr) => acc + Number(curr.amount), 0);
+  const balance = totalIncome - totalExpense;
+
+  if (loading) {
+    return (
+      <div className="p-4 flex items-center justify-center min-h-full text-gray-500">
+        Memuat data kas syariah...
+      </div>
+    );
+  }
 
   return (
     <div className="p-4 relative min-h-full">
@@ -111,8 +141,14 @@ export function BukuKas() {
               <div>
                 <p className="font-semibold text-gray-800">{trx.category}</p>
                 <div className="flex items-center gap-2 mt-1">
-                  <span className="text-xs text-gray-500">{trx.date}</span>
-                  {trx.isHalal && (
+                  <span className="text-xs text-gray-500">
+                    {/* Mengonversi format timestamp database menjadi string tanggal lokal */}
+                    {new Date(trx.date).toLocaleDateString("id-ID", {
+                      day: "numeric",
+                      month: "short",
+                    })}
+                  </span>
+                  {(trx.is_halal ?? trx.isHalal) && (
                     <span className="text-[10px] bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded-full flex items-center gap-1 border border-emerald-200">
                       <ShieldCheck size={10} /> Syariah
                     </span>
@@ -123,7 +159,8 @@ export function BukuKas() {
             <p
               className={`font-bold ${trx.type === "income" ? "text-emerald-600" : "text-gray-800"}`}
             >
-              {trx.type === "income" ? "+" : "-"}Rp{trx.amount / 1000}k
+              {trx.type === "income" ? "+" : "-"}Rp
+              {(Number(trx.amount) / 1000).toLocaleString("id-ID")}k
             </p>
           </div>
         ))}

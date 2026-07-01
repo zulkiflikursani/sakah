@@ -1,12 +1,10 @@
 "use client";
 import Image from "next/image";
 import { useState, useEffect } from "react";
-import { BukuKas } from "@/app/components/BukuKas";
+import { BukuKas } from "@/app/bukukas/BukuKas";
 import { Kalkulator } from "@/app/components/Kalkulator";
 import { Edukasi } from "@/app/components/Edukasi";
 import { Gamifikasi } from "@/app/components/Gamifikasi";
-import { NavItem } from "@/app/components/NavItem";
-import { SidebarItem } from "@/app/components/SidebarItem";
 
 import {
   Home,
@@ -16,6 +14,8 @@ import {
   Wallet,
   ShieldCheck,
 } from "lucide-react";
+import SideBar from "./components/SideBar";
+import NavbarMobile from "./components/NavbarMobile";
 export default function App() {
   const [activeTab, setActiveTab] = useState("kas");
   useEffect(() => {
@@ -63,44 +63,7 @@ export default function App() {
   return (
     <div className="h-screen bg-gray-50 flex font-sans overflow-hidden">
       {/* Sidebar untuk Desktop / Tablet (Tersembunyi di Mobile) */}
-      <aside className="hidden md:flex flex-col w-64 bg-emerald-700 text-white shadow-xl z-20 shrink-0">
-        <div className="p-6 bg-emerald-800">
-          <h1 className="text-2xl font-bold flex items-center gap-2">
-            <ShieldCheck size={28} className="text-emerald-300" />
-            SAKAH
-          </h1>
-          <p className="text-xs text-emerald-200 mt-1">
-            Sahabat Keuangan Halal
-          </p>
-        </div>
-        <nav className="flex-1 px-4 py-6 space-y-2">
-          <SidebarItem
-            icon={<Home size={20} />}
-            label="Buku Kas"
-            isActive={activeTab === "kas"}
-            onClick={() => setActiveTab("kas")}
-          />
-          <SidebarItem
-            icon={<Calculator size={20} />}
-            label="Kalkulator"
-            isActive={activeTab === "kalkulator"}
-            onClick={() => setActiveTab("kalkulator")}
-          />
-          <SidebarItem
-            icon={<BookOpen size={20} />}
-            label="Edukasi"
-            isActive={activeTab === "edukasi"}
-            onClick={() => setActiveTab("edukasi")}
-          />
-          <SidebarItem
-            icon={<Trophy size={20} />}
-            label="Gamifikasi"
-            isActive={activeTab === "gamifikasi"}
-            onClick={() => setActiveTab("gamifikasi")}
-          />
-        </nav>
-      </aside>
-
+      <SideBar activeTab={activeTab} setActiveTab={setActiveTab} />
       {/* Area Konten Utama */}
       <div className="flex-1 flex flex-col min-w-0 relative">
         {/* Header Aplikasi */}
@@ -142,32 +105,7 @@ export default function App() {
         </main>
 
         {/* Navigasi Bawah untuk Mobile (Tersembunyi di Desktop) */}
-        <nav className="md:hidden absolute bottom-0 w-full bg-white border-t border-gray-200 px-6 py-3 flex justify-between items-center z-20 pb-safe">
-          <NavItem
-            icon={<Home size={24} />}
-            label="Kas"
-            isActive={activeTab === "kas"}
-            onClick={() => setActiveTab("kas")}
-          />
-          <NavItem
-            icon={<Calculator size={24} />}
-            label="Hitung"
-            isActive={activeTab === "kalkulator"}
-            onClick={() => setActiveTab("kalkulator")}
-          />
-          <NavItem
-            icon={<BookOpen size={24} />}
-            label="Edukasi"
-            isActive={activeTab === "edukasi"}
-            onClick={() => setActiveTab("edukasi")}
-          />
-          <NavItem
-            icon={<Trophy size={24} />}
-            label="Poin"
-            isActive={activeTab === "gamifikasi"}
-            onClick={() => setActiveTab("gamifikasi")}
-          />
-        </nav>
+        <NavbarMobile activeTab={activeTab} setActiveTab={setActiveTab} />
       </div>
     </div>
   );

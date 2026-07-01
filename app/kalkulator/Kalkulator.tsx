@@ -12,7 +12,7 @@ export function Kalkulator() {
   const zakat = isWajib ? hartaBersih * 0.025 : 0;
 
   return (
-    <div className="p-4 space-y-6">
+    <div className="p-4 space-y-6 overscroll-contain">
       {/* Header Kalkulator */}
       <div>
         <h2 className="text-xl font-bold text-gray-800">Kalkulator Syariah</h2>

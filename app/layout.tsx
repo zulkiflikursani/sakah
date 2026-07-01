@@ -25,7 +25,7 @@ export const metadata: Metadata = {
     "Aplikasi keuangan syariah untuk membantu mengelola keuangan pribadi dan bisnis sesuai prinsip syariah.",
   appleWebApp: {
     capable: true,
-    statusBarStyle: "default",
+    statusBarStyle: "black-translucent",
     title: "Sakka",
     // startUpImage: [],
   },

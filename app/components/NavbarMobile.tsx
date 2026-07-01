@@ -8,7 +8,7 @@ export default function NavbarMobile({
   setActiveTab: (tab: string) => void;
 }) {
   return (
-    <nav className="md:hidden absolute bottom-0 w-full bg-white border-t border-gray-200 px-6 py-3 flex justify-between items-center z-20 pb-safe">
+    <nav className="md:hidden absolute bottom-0 w-full pt-safe bg-white border-t border-gray-200 px-6 py-3 flex justify-between items-center z-20 pb-safe">
       <NavItem
         icon={<Home size={24} />}
         label="Kas"

@@ -23,6 +23,12 @@ export const metadata: Metadata = {
   title: "Sakka",
   description:
     "Aplikasi keuangan syariah untuk membantu mengelola keuangan pribadi dan bisnis sesuai prinsip syariah.",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Sakka",
+    // startUpImage: [],
+  },
 };
 
 export default function RootLayout({

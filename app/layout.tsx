@@ -13,6 +13,9 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 1,
   userScalable: false,
+  // Konten menjangkau sampai bawah status bar iOS (notch) —
+  // pasangan dari statusBarStyle: "black-translucent"
+  viewportFit: "cover",
 };
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",

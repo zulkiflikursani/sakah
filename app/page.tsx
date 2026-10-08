@@ -40,7 +40,7 @@ function AppContent() {
       document.head.appendChild(meta);
     }
     meta.content =
-      "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no";
+      "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover";
 
     // 2. Mencegah pinch-to-zoom (cubit dengan 2 jari)
     const handleTouchStart = (e: TouchEvent) => {
@@ -78,7 +78,7 @@ function AppContent() {
       {/* Area Konten Utama */}
       <div className="flex-1 flex flex-col min-w-0 relative">
         {/* Header Aplikasi */}
-        <header className="bg-emerald-600 md:bg-white text-white md:text-gray-800 p-4 shadow-md md:shadow-sm md:border-b border-gray-200 z-10 shrink-0">
+        <header className="bg-emerald-600 md:bg-white text-white md:text-gray-800 px-4 pb-4 pt-[calc(env(safe-area-inset-top)_+_1rem)] md:p-4 shadow-md md:shadow-sm md:border-b border-gray-200 z-10 shrink-0">
           <div className="flex justify-between items-center max-w-6xl mx-auto">
             {/* Tampilan Header Mobile */}
             <div className="md:hidden">

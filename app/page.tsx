@@ -1,22 +1,33 @@
 "use client";
-import Image from "next/image";
 import { useState, useEffect } from "react";
+import { ShieldCheck, User } from "lucide-react";
 import { BukuKas } from "@/app/bukukas/BukuKas";
 import { Kalkulator } from "@/app/kalkulator/Kalkulator";
 import { Edukasi } from "@/app/edukasi/Edukasi";
 import { Gamifikasi } from "@/app/gamifikasi/Gamifikasi";
-
-import {
-  Home,
-  Calculator,
-  BookOpen,
-  Trophy,
-  Wallet,
-  ShieldCheck,
-} from "lucide-react";
+import { Admin } from "@/app/admin/Admin";
 import SideBar from "./components/SideBar";
 import NavbarMobile from "./components/NavbarMobile";
+import { AuthProvider, useAuth } from "./components/AuthContext";
+
+const JUDUL_TAB: Record<string, string> = {
+  kas: "Buku Kas Halal",
+  kalkulator: "Kalkulator Syariah",
+  edukasi: "Pusat Edukasi",
+  gamifikasi: "Gamifikasi",
+  admin: "Manajemen Konten",
+};
+
 export default function App() {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
+  );
+}
+
+function AppContent() {
+  const { user, openAuth } = useAuth();
   const [activeTab, setActiveTab] = useState("kas");
   useEffect(() => {
     // 1. Set Meta Viewport agar user-scalable=no
@@ -80,27 +91,47 @@ export default function App() {
 
             {/* Tampilan Header Desktop */}
             <div className="hidden md:block">
-              <h2 className="text-xl font-bold capitalize text-gray-800">
-                {activeTab === "kas" ? "Buku Kas Halal" : activeTab}
+              <h2 className="text-xl font-bold text-gray-800">
+                {JUDUL_TAB[activeTab] ?? activeTab}
               </h2>
             </div>
 
-            <div className="bg-emerald-700 md:bg-emerald-50 p-2 rounded-full cursor-pointer hover:bg-emerald-800 md:hover:bg-emerald-100 transition">
-              <Wallet
-                size={20}
-                className="text-emerald-100 md:text-emerald-600"
-              />
-            </div>
+            <button
+              type="button"
+              onClick={() => openAuth(user ? "akun" : "login")}
+              aria-label={user ? "Akun saya" : "Masuk akun"}
+              className="bg-emerald-700 md:bg-emerald-50 p-2 rounded-full cursor-pointer hover:bg-emerald-800 md:hover:bg-emerald-100 transition flex items-center justify-center min-w-[36px] min-h-[36px]"
+            >
+              {user ? (
+                <span className="text-xs font-bold text-emerald-100 md:text-emerald-700">
+                  {user.name
+                    .split(/\s+/)
+                    .map((w) => w[0])
+                    .filter(Boolean)
+                    .slice(0, 2)
+                    .join("")
+                    .toUpperCase()}
+                </span>
+              ) : (
+                <User
+                  size={20}
+                  className="text-emerald-100 md:text-emerald-600"
+                />
+              )}
+            </button>
           </div>
         </header>
 
         {/* Konten Tab yang bisa di-scroll */}
         <main className="flex-1 overflow-y-auto overscroll-behavior-y-contain p-4 md:p-8 pb-24 md:pb-8">
-          <div className="max-w-6xl mx-auto h-full">
+          <div className="max-w-6xl mx-auto pb-24 md:pb-8">
             {activeTab === "kas" && <BukuKas />}
             {activeTab === "kalkulator" && <Kalkulator />}
             {activeTab === "edukasi" && <Edukasi />}
-            {activeTab === "gamifikasi" && <Gamifikasi />}
+            {activeTab === "gamifikasi" && (
+              <Gamifikasi setActiveTab={setActiveTab} />
+            )}
+            {activeTab === "admin" && <Admin />}
           </div>
         </main>
 

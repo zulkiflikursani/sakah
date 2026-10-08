@@ -4,9 +4,22 @@ import { useState, useEffect } from "react";
 import { ShieldCheck, TrendingUp, TrendingDown, Plus } from "lucide-react";
 import { AddTransactionModal } from "../components/AddTransactionModel";
 
+type Transaction = {
+  id: string | number;
+  type: string;
+  amount: string | number;
+  category: string;
+  date?: string;
+  is_halal?: boolean;
+  isHalal?: boolean;
+};
+
+const rupiah = (n: number) => `Rp ${n.toLocaleString("id-ID")}`;
+
 export function BukuKas() {
   const [showAddForm, setShowAddForm] = useState(false);
-  const [transactions, setTransactions] = useState<any[]>([]);
+  const [showAll, setShowAll] = useState(false);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
 
   // 1. Fungsi untuk mengambil data dari API Endpoint Vercel Postgres
@@ -30,9 +43,12 @@ export function BukuKas() {
   }, []);
 
   // 2. Fungsi untuk menyimpan data baru via POST ke API
-  const handleAddTransaction = async (
-    newTrx: Omit<(typeof transactions)[0], "id">,
-  ) => {
+  const handleAddTransaction = async (newTrx: {
+    type: string;
+    amount: number;
+    category: string;
+    isHalal: boolean;
+  }) => {
     try {
       const res = await fetch("/api/transaksi", {
         method: "POST",
@@ -131,6 +147,9 @@ export function BukuKas() {
     );
   }
 
+  // Transaksi terbaru (default 5, bisa diperluas)
+  const terlihat = showAll ? transactions : transactions.slice(0, 5);
+
   return (
     <div className="p-4 relative min-h-full">
       {/* Saldo Card */}
@@ -172,13 +191,27 @@ export function BukuKas() {
       {/* Transaksi Terbaru */}
       <div className="mb-4 flex justify-between items-end">
         <h3 className="font-bold text-gray-800 text-lg">Transaksi Terbaru</h3>
-        <button className="text-emerald-600 text-sm font-medium">
-          Lihat Semua
-        </button>
+        {transactions.length > 5 && (
+          <button
+            onClick={() => setShowAll((v) => !v)}
+            className="text-emerald-700 text-sm font-semibold hover:underline"
+          >
+            {showAll ? "Tampilkan 5" : "Lihat Semua"}
+          </button>
+        )}
       </div>
 
+      {transactions.length === 0 && (
+        <div className="bg-white p-8 rounded-xl border border-dashed border-gray-200 text-center">
+          <p className="font-semibold text-gray-700">Belum ada transaksi</p>
+          <p className="text-sm text-gray-600 mt-1">
+            Tekan tombol + untuk mencatat pemasukan atau pengeluaran pertama.
+          </p>
+        </div>
+      )}
+
       <div className="space-y-3">
-        {transactions.map((trx) => (
+        {terlihat.map((trx) => (
           <div
             key={trx.id}
             className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex justify-between items-center"
@@ -196,12 +229,14 @@ export function BukuKas() {
               <div>
                 <p className="font-semibold text-gray-800">{trx.category}</p>
                 <div className="flex items-center gap-2 mt-1">
-                  <span className="text-xs text-gray-500">
+                  <span className="text-xs text-gray-600">
                     {/* Mengonversi format timestamp database menjadi string tanggal lokal */}
-                    {new Date(trx.date).toLocaleDateString("id-ID", {
-                      day: "numeric",
-                      month: "short",
-                    })}
+                    {trx.date && !Number.isNaN(new Date(trx.date).getTime())
+                      ? new Date(trx.date).toLocaleDateString("id-ID", {
+                          day: "numeric",
+                          month: "short",
+                        })
+                      : "Baru saja"}
                   </span>
                   {(trx.is_halal ?? trx.isHalal) && (
                     <span className="text-[10px] bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded-full flex items-center gap-1 border border-emerald-200">
@@ -212,10 +247,10 @@ export function BukuKas() {
               </div>
             </div>
             <p
-              className={`font-bold ${trx.type === "income" ? "text-emerald-600" : "text-gray-800"}`}
+              className={`font-bold ${trx.type === "income" ? "text-emerald-700" : "text-rose-600"}`}
             >
-              {trx.type === "income" ? "+" : "-"}Rp
-              {(Number(trx.amount) / 1000).toLocaleString("id-ID")}k
+              {trx.type === "income" ? "+" : "-"}
+              {rupiah(Number(trx.amount))}
             </p>
           </div>
         ))}

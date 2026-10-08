@@ -3,6 +3,9 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  /* Aplikasi ini bergaya terang (kartu putih) — paksa skema terang
+     agar teks input tidak mewarisi warna terang dari system dark mode */
+  color-scheme: light;
 }
 
 @theme inline {
@@ -12,16 +15,57 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
+/* Skema dark bawaan template dimatikan: seluruh UI memakai latar terang */
 
 body {
   overscroll-behavior: none;
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Pastikan teks input selalu kontras di atas latar putih */
+input,
+textarea,
+select {
+  color: var(--foreground);
+  background-color: #ffffff;
+}
+input::placeholder,
+textarea::placeholder {
+  color: #6b7280;
+  opacity: 1;
+}
+input[type="range"] {
+  background-color: transparent;
+}
+
+/* Utility yang dipakai komponen tapi belum terdefinisi */
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+@keyframes slide-up {
+  from {
+    transform: translateY(100%);
+    opacity: 0.6;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+.animate-slide-up {
+  animation: slide-up 0.25s ease-out;
+}
+
+.pt-safe {
+  padding-top: env(safe-area-inset-top);
+}
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom);
 }

@@ -1,11 +1,20 @@
 import { useState } from "react";
 import { X } from "lucide-react";
+
+export type NewTransaction = {
+  type: string;
+  amount: number;
+  category: string;
+  date: string;
+  isHalal: boolean;
+};
+
 export function AddTransactionModal({
   onClose,
   onSave,
 }: {
   onClose: () => void;
-  onSave: (transaction: any) => void;
+  onSave: (transaction: NewTransaction) => void;
 }) {
   const [type, setType] = useState("income");
   const [amount, setAmount] = useState("");
@@ -104,7 +113,8 @@ export function AddTransactionModal({
 
           <button
             type="submit"
-            className="w-full bg-emerald-600 text-white font-bold py-4 rounded-xl hover:bg-emerald-700 active:scale-[0.98] transition-all text-lg shadow-lg shadow-emerald-600/30"
+            disabled={!amount || !category}
+            className="w-full bg-emerald-600 text-white font-bold py-4 rounded-xl hover:bg-emerald-700 active:scale-[0.98] transition-all text-lg shadow-lg shadow-emerald-600/30 disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100"
           >
             Simpan Transaksi
           </button>

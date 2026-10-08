@@ -4,11 +4,10 @@ import {
   Calculator,
   BookOpen,
   Trophy,
-  Wallet,
+  Settings,
   ShieldCheck,
 } from "lucide-react";
-import Image from "next/image";
-import { useState, useEffect } from "react";
+import { useAuth } from "./AuthContext";
 export default function SideBar({
   activeTab,
   setActiveTab,
@@ -16,6 +15,7 @@ export default function SideBar({
   activeTab: string;
   setActiveTab: (tab: string) => void;
 }) {
+  const { user } = useAuth();
   return (
     <aside className="hidden md:flex flex-col w-64 bg-emerald-700 text-white shadow-xl z-20 shrink-0">
       <div className="p-6 bg-emerald-800">
@@ -50,6 +50,14 @@ export default function SideBar({
           isActive={activeTab === "gamifikasi"}
           onClick={() => setActiveTab("gamifikasi")}
         />
+        {user?.role === "admin" && (
+          <SidebarItem
+            icon={<Settings size={20} />}
+            label="Kelola"
+            isActive={activeTab === "admin"}
+            onClick={() => setActiveTab("admin")}
+          />
+        )}
       </nav>
     </aside>
   );

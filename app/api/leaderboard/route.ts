@@ -22,13 +22,23 @@ export async function GET() {
       LIMIT 10
     `;
 
-    // Posisi pengguna saat ini + total pengguna
+    // Posisi pengguna saat ini + total pengguna, dengan urutan yang SAMA
+    // dengan ranking di atas (poin DESC, created_at ASC) agar konsisten
     const hitung = await sql`
-      SELECT (count(*) + 1)::int AS rank,
-             (SELECT count(*)::int FROM users) AS total
-      FROM users
-      WHERE poin > ${user.poin}
+      WITH peringkat AS (
+        SELECT id,
+               ROW_NUMBER() OVER (ORDER BY poin DESC, created_at ASC) AS rank,
+               COUNT(*) OVER () AS total
+        FROM users
+      )
+      SELECT rank, total FROM peringkat WHERE id = ${user.id}
     `;
+    if (hitung.rows.length === 0) {
+      return NextResponse.json(
+        { success: false, error: "Akun tidak ditemukan" },
+        { status: 404 },
+      );
+    }
     const s = hitung.rows[0] as { rank: number; total: number };
 
     return NextResponse.json({

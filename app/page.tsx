@@ -72,7 +72,10 @@ function AppContent() {
     };
   }, []);
   return (
-    <div className="h-screen bg-gray-50 flex font-sans overflow-hidden">
+    <div
+      className="bg-gray-50 flex font-sans overflow-hidden"
+      style={{ height: "var(--app-height, 100dvh)" }}
+    >
       {/* Sidebar untuk Desktop / Tablet (Tersembunyi di Mobile) */}
       <SideBar activeTab={activeTab} setActiveTab={setActiveTab} />
       {/* Area Konten Utama */}

@@ -1,8 +1,15 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { ShieldCheck, TrendingUp, TrendingDown, Plus } from "lucide-react";
+import {
+  ShieldCheck,
+  TrendingUp,
+  TrendingDown,
+  Plus,
+  LogIn,
+} from "lucide-react";
 import { AddTransactionModal } from "../components/AddTransactionModel";
+import { useAuth } from "../components/AuthContext";
 
 type Transaction = {
   id: string | number;
@@ -17,15 +24,20 @@ type Transaction = {
 const rupiah = (n: number) => `Rp ${n.toLocaleString("id-ID")}`;
 
 export function BukuKas() {
+  const { user, memuat, openAuth } = useAuth();
   const [showAddForm, setShowAddForm] = useState(false);
   const [showAll, setShowAll] = useState(false);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // 1. Fungsi untuk mengambil data dari API Endpoint Vercel Postgres
+  // 1. Ambil data transaksi milik user login (API mengembalikan 401 bila belum login)
   const fetchTransactions = async () => {
     try {
       const res = await fetch("/api/transaksi");
+      if (res.status === 401) {
+        setTransactions([]);
+        return;
+      }
       const json = await res.json();
       if (json.success) {
         setTransactions(json.data);
@@ -37,12 +49,19 @@ export function BukuKas() {
     }
   };
 
-  // Jalankan fetch saat komponen pertama kali dimuat
+  // Hanya ambil data setelah sesi selesai dicek DAN user sudah login
   useEffect(() => {
+    if (memuat) return; // sesi belum pasti — jangan fetch dulu
+    if (!user) {
+      setTransactions([]);
+      setLoading(false);
+      return;
+    }
+    setLoading(true);
     fetchTransactions();
-  }, []);
+  }, [memuat, user]);
 
-  // 2. Fungsi untuk menyimpan data baru via POST ke API
+  // 2. Simpan transaksi baru — terikat ke user login di sisi server
   const handleAddTransaction = async (newTrx: {
     type: string;
     amount: number;
@@ -59,12 +78,17 @@ export function BukuKas() {
           type: newTrx.type,
           amount: newTrx.amount,
           category: newTrx.category,
-          is_halal: newTrx.isHalal ?? true, // Menyesuaikan nama properti database snake_case
+          is_halal: newTrx.isHalal ?? true,
         }),
       });
 
+      if (res.status === 401) {
+        setShowAddForm(false);
+        openAuth("login");
+        return;
+      }
+
       if (res.ok) {
-        // Segarkan data dari database agar sinkron secara real-time
         fetchTransactions();
         setShowAddForm(false);
       } else {
@@ -75,7 +99,7 @@ export function BukuKas() {
     }
   };
 
-  // Logika kalkulasi keuangan tetap sama (Konversi Number untuk menjaga presisi tipe DECIMAL)
+  // Hitung total (konversi Number untuk presisi DECIMAL)
   const totalIncome = transactions
     .filter((t) => t.type === "income")
     .reduce((acc, curr) => acc + Number(curr.amount), 0);
@@ -84,7 +108,8 @@ export function BukuKas() {
     .reduce((acc, curr) => acc + Number(curr.amount), 0);
   const balance = totalIncome - totalExpense;
 
-  if (loading) {
+  // Selama sesi belum pasti, tampilkan skeleton agar tidak kedip ke layar login
+  if (memuat || (user && loading)) {
     return (
       <div className="p-4 relative min-h-full animate-pulse select-none">
         {/* Skeleton Saldo Card */}
@@ -119,7 +144,7 @@ export function BukuKas() {
           <div className="h-4 bg-gray-200 rounded w-16"></div>
         </div>
 
-        {/* Skeleton List Transaksi (Looping 3 Baris Tiruan) */}
+        {/* Skeleton List Transaksi */}
         <div className="space-y-3">
           {[1, 2, 3].map((index) => (
             <div
@@ -127,9 +152,7 @@ export function BukuKas() {
               className="bg-white p-4 rounded-xl border border-gray-100 flex justify-between items-center"
             >
               <div className="flex items-center gap-3 w-2/3">
-                {/* Lingkaran Ikon */}
                 <div className="bg-gray-200 rounded-full h-11 w-11 shrink-0"></div>
-                {/* Teks Kategori & Tanggal */}
                 <div className="w-full space-y-2">
                   <div className="h-4 bg-gray-200 rounded w-3/4"></div>
                   <div className="flex gap-2">
@@ -138,7 +161,6 @@ export function BukuKas() {
                   </div>
                 </div>
               </div>
-              {/* Nominal Kanan */}
               <div className="h-5 bg-gray-200 rounded w-16"></div>
             </div>
           ))}
@@ -147,7 +169,32 @@ export function BukuKas() {
     );
   }
 
-  // Transaksi terbaru (default 5, bisa diperluas)
+  // Belum login — arahkan ke modal login, jangan tampilkan buku kas
+  if (!user) {
+    return (
+      <div className="p-4 relative min-h-full flex items-center justify-center">
+        <div className="bg-white p-8 rounded-2xl border border-gray-100 shadow-sm text-center max-w-sm w-full">
+          <div className="bg-emerald-100 text-emerald-600 w-16 h-16 rounded-full mx-auto flex items-center justify-center mb-4">
+            <LogIn size={28} />
+          </div>
+          <h3 className="font-bold text-gray-800 text-lg">
+            Login untuk mulai mencatat
+          </h3>
+          <p className="text-sm text-gray-600 mt-2 mb-6">
+            Buku kas ini bersifat pribadi. Masuk atau daftar agar pemasukan dan
+            pengeluaranmu tersimpan aman di akunmu.
+          </p>
+          <button
+            onClick={() => openAuth("login")}
+            className="w-full bg-emerald-600 text-white font-bold py-3 rounded-xl hover:bg-emerald-700 active:scale-[0.98] transition-all"
+          >
+            Masuk / Daftar
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   const terlihat = showAll ? transactions : transactions.slice(0, 5);
 
   return (
@@ -230,7 +277,6 @@ export function BukuKas() {
                 <p className="font-semibold text-gray-800">{trx.category}</p>
                 <div className="flex items-center gap-2 mt-1">
                   <span className="text-xs text-gray-600">
-                    {/* Mengonversi format timestamp database menjadi string tanggal lokal */}
                     {trx.date && !Number.isNaN(new Date(trx.date).getTime())
                       ? new Date(trx.date).toLocaleDateString("id-ID", {
                           day: "numeric",

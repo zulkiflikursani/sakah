@@ -24,6 +24,26 @@ body {
   background-color: #059669;
 }
 
+/* Tinggi tampilan yang benar di iPhone/PWA (viewport-fit=cover):
+   100vh = tinggi fisik layar yang menembus home indicator sehingga
+   navbar bawah ikut terpotong. dvh = tinggi area yang benar-benar
+   terlihat dan menyesuaikan saat chrome Safari menyusut/meluas.
+   fallback: 100vh untuk browser lama, lalu 100svh (area aman). */
+html,
+body {
+  height: 100%;
+}
+@supports (height: 100dvh) {
+  :root {
+    --app-height: 100dvh;
+  }
+}
+@supports not (height: 100dvh) {
+  :root {
+    --app-height: 100vh;
+  }
+}
+
 body {
   overscroll-behavior: none;
   color: var(--foreground);

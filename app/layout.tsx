@@ -23,13 +23,13 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Sakka",
+  title: "sakah",
   description:
     "Aplikasi keuangan syariah untuk membantu mengelola keuangan pribadi dan bisnis sesuai prinsip syariah.",
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
-    title: "Sakka",
+    title: "sakah",
     // startUpImage: [],
   },
 };
@@ -43,8 +43,12 @@ export default function RootLayout({
     <html
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-    >
+    >      <head />
+      <link rel="manifest" href="/manifest.json" />
+      <meta name="theme-color" content="#059669" />
+      <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
       <body className="min-h-full flex flex-col">{children}</body>
-    </html>
+    </html
+>
   );
 }

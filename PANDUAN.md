@@ -1,6 +1,6 @@
-# Panduan Penggunaan Aplikasi Sakka
+# Panduan Penggunaan Aplikasi sakah
 
-**Sakka** adalah aplikasi keuangan syariah untuk mengelola keuangan pribadi dan bisnis sesuai prinsip syariah — dilengkapi kalkulator syariah, pusat edukasi 12 akad dengan kuis berhadiah poin, dan gamifikasi belajar.
+**sakah** adalah aplikasi keuangan syariah untuk mengelola keuangan pribadi dan bisnis sesuai prinsip syariah — dilengkapi kalkulator syariah, pusat edukasi 12 akad dengan kuis berhadiah poin, dan gamifikasi belajar.
 
 Panduan ini menjelaskan **semua fitur**, mulai dari pendaftaran hingga panel admin.
 
@@ -198,6 +198,21 @@ Akun admin sudah dibuat:
 - **Kata sandi**: `Admin12345`
 
 > ⚠️ **Segera ganti kata sandi** setelah pertama login (hapus akun lama lalu daftar ulang dengan email & sandi baru, lalu beri peran `admin` lewat SQL: `UPDATE users SET role='admin' WHERE email='...'`).
+
+### PWA / Instalasi di HP
+
+Aplikasi bisa diinstal di Home Screen (iOS/Android) sehingga tampak seperti aplikasi native:
+
+1. Buka aplikasi di browser (Safari di iPhone, Chrome di Android).
+2. Ketuk tombol **Share** → pilih **"Add to Home Screen"** (iOS) atau **"Install sakah"** (Android Chrome).
+3. Setelah terinstal, buka dari Home Screen.
+
+Hasil instalasi:
+
+- Layar naik **fullscreen tanpa browser chrome**.
+- **Status bar hijau** sesuai warna logo aplikasi (`#059669`).
+- Icon di Home Screen sesuai logo (ikon hijau dengan huruf “S”).
+- Nama aplikasi yang muncul di Home Screen: **sakah**.
 
 Setelah login, menu **"Kelola"** muncul di sidebar (desktop) dan navbar bawah (mobile). Pengguna biasa **tidak melihat** menu ini, dan API-nya menolak dengan `403 Forbidden`.
 

@@ -1,12 +1,24 @@
 import { sql } from "@vercel/postgres";
 import { NextResponse } from "next/server";
+import { getSessionUser } from "@/app/api/auth/session";
 
-// 1. [GET] Endpoint untuk mengambil semua transaksi syariah
+// 1. [GET] Ambil transaksi milik user yang sedang login
 export async function GET() {
+  const user = await getSessionUser();
+  if (!user) {
+    return NextResponse.json(
+      { success: false, error: "Silakan login terlebih dahulu" },
+      { status: 401 },
+    );
+  }
+
   try {
-    // Mengambil data urut dari yang paling baru
+    // Hanya transaksi milik user ini, urut dari yang terbaru
     const { rows } = await sql`
-      SELECT * FROM transaksi_syariah ORDER BY date DESC
+      SELECT id, type, amount, category, date, is_halal
+      FROM transaksi_syariah
+      WHERE user_id = ${user.id}
+      ORDER BY date DESC
     `;
 
     return NextResponse.json({ success: true, data: rows }, { status: 200 });
@@ -19,14 +31,20 @@ export async function GET() {
   }
 }
 
-// 2. [POST] Endpoint untuk menyimpan transaksi syariah baru
+// 2. [POST] Simpan transaksi baru untuk user yang sedang login
 export async function POST(request: Request) {
+  const user = await getSessionUser();
+  if (!user) {
+    return NextResponse.json(
+      { success: false, error: "Silakan login untuk mencatat transaksi" },
+      { status: 401 },
+    );
+  }
+
   try {
-    // Membaca data JSON yang dikirim oleh frontend
     const body = await request.json();
     const { type, amount, category, is_halal } = body;
 
-    // Validasi input finansial dasar
     if (!type || !amount || !category) {
       return NextResponse.json(
         { success: false, error: "Data tidak lengkap" },
@@ -34,11 +52,11 @@ export async function POST(request: Request) {
       );
     }
 
-    // Eksekusi aman terproteksi dari SQL Injection
+    // user_id diambil dari sesi — bukan dari klien — agar tidak bisa mengaku pemilik lain
     const result = await sql`
-      INSERT INTO transaksi_syariah (type, amount, category, is_halal)
-      VALUES (${type}, ${amount}, ${category}, ${is_halal ?? true})
-      RETURNING *;
+      INSERT INTO transaksi_syariah (type, amount, category, is_halal, user_id)
+      VALUES (${type}, ${amount}, ${category}, ${is_halal ?? true}, ${user.id})
+      RETURNING id, type, amount, category, date, is_halal;
     `;
 
     return NextResponse.json(
